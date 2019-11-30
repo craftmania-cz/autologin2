@@ -1,1 +1,30 @@
-# Defaultni config
+debug: true
+
+sql:
+  hostname: host
+  port: 3306
+  database: database
+  username: user
+  password: password
+
+settings:
+  minimumConnections: 2
+  maximumConnections: 5
+  timeout: 30000
+
+connectivity:
+  connect_timeout: 3000
+  read_timeout: 3000
+
+messages:
+  invalid_nick: "&cTento nick obsahuje neplatné znaky!"
+  invalid_token: "&cVypadá to, že se snažíš připojit s warez na originální nick - připoj se znovu."
+
+servers:
+  auth:
+    - "whub"
+  lobbies:
+    - "ohub"
+    - "lobby2"
+    - "lobby"
+    - "lobby4"

@@ -1,5 +1,5 @@
-name: GradleTemplate
+name: AutoLogin2
 version: 1.0.0
-description: Template for Gradle plugins
-author: MrWakeCZ
-main: cz.craftmania.template.Main
+description: Original-logins for CraftMania Auth
+author: "iGniSsak"
+main: cz.craftmania.autologin2.Main

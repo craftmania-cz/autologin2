@@ -5,7 +5,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven'
 
-group 'cz.craftmania.template'
+group 'cz.craftmania.autologin2'
 version '1.0.0'
 
 sourceCompatibility = 1.8
@@ -21,14 +21,18 @@ clean { delete "./build" }
 
 repositories {
     mavenCentral()
-    maven { url "https://packages.craftmania.cz/repository/craftmania/" }
     maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
+    maven { url "http://repo.codemc.org/repository/maven-public/" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 dependencies {
-    compileOnly ('org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT') {
-        exclude group: 'net.md-5'
-    }
+    compileOnly group: 'net.md-5', name: 'bungeecord-api', version:'1.14-SNAPSHOT'
+    compileOnly 'io.github.waterfallmc:waterfall-api:1.14-SNAPSHOT'
+
+    compile group: 'com.zaxxer', name: 'HikariCP', version: '3.4.1'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version:'3.9.1'
+    compile 'org.json:json:20171018'
 }
 
 task compilePlugin(type: Jar) {
