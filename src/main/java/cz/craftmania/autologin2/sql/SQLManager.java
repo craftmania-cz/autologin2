@@ -62,7 +62,7 @@ public class SQLManager {
         PreparedStatement ps = null;
         try {
             conn = pool.getConnection();
-            ps = conn.prepareStatement("SELECT * FROM autologin_players WHERE nick = ?;");
+            ps = conn.prepareStatement("SELECT * FROM autologin_players WHERE nick LIKE ?;");
             ps.setString(1, nick);
             ps.executeQuery();
             return ps.getResultSet().next();
@@ -90,12 +90,44 @@ public class SQLManager {
         }
     }
 
-    public void quit(String nick) {
+    public void insertData( String nick) {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
             conn = pool.getConnection();
-            ps = conn.prepareStatement("UPDATE autologin_players SET last_online = CURRENT_TIMESTAMP WHERE nick = ?;");
+            ps = conn.prepareStatement("INSERT INTO autologin_players (nick, last_online) VALUES(?, CURRENT_TIMESTAMP);");
+            ps.setString(1, nick);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            pool.close(conn, ps, null);
+        }
+    }
+
+
+    public void quit(String nick, UUID uuid) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = pool.getConnection();
+            ps = conn.prepareStatement("UPDATE autologin_players SET last_online = CURRENT_TIMESTAMP, uuid = ? WHERE nick = ?;");
+            ps.setString(1, nick);
+            ps.setString(2, uuid.toString());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            pool.close(conn, ps, null);
+        }
+    }
+
+    public void remove(String nick) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = pool.getConnection();
+            ps = conn.prepareStatement("DELETE FROM autologin_players WHERE nick = ?;");
             ps.setString(1, nick);
             ps.executeUpdate();
         } catch (Exception e) {

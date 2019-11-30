@@ -103,6 +103,7 @@ public class LoginListener implements Listener {
             // Player is on auth server
             if (Main.getSqlManager().isInDatabase(player.getName())) {
                 ServerInfo target = Main.getLoginManager().getRandomLobby();
+                if (target == null) return;
                 event.setTarget(target);
                 Log.debug(player.getName() + " is original, forwarding to: " + target.getName());
             }
@@ -112,7 +113,7 @@ public class LoginListener implements Listener {
     @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        if (Main.getSqlManager().isInDatabase(player.getName())) Main.getSqlManager().quit(player.getName());
+        if (Main.getSqlManager().isInDatabase(player.getName())) Main.getSqlManager().quit(player.getName(), player.getUniqueId());
     }
 
 }

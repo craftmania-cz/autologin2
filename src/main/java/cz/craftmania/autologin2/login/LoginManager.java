@@ -27,6 +27,7 @@ public class LoginManager {
             Request request = (new Request.Builder()).url("https://api.mojang.com/users/profiles/minecraft/" + nick).build();
             Response response = caller.newCall(request).execute();
             json = new JSONObject(response.body().string());
+            Log.debug("Connected to Mojang API.");
             if (json.isNull("name")) {
                 warezNicks.add(nick);
                 return false;
@@ -35,6 +36,7 @@ public class LoginManager {
             return true;
         } catch (Exception e) {
             warezNicks.add(nick);
+            Log.debug("Error while connecting to Mojang API - nick is not original.");
             return false;
         }
 
@@ -56,6 +58,7 @@ public class LoginManager {
     public ServerInfo getRandomLobby() {
         Random r = new Random();
         List<ServerInfo> servers = Main.getOptions().getLobbyServers();
+        if (servers.size() == 0) return null;
         if (servers.size() == 1) return servers.get(0);
         return servers.get(r.nextInt(servers.size() - 1));
     }
