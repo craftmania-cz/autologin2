@@ -27,8 +27,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly group: 'net.md-5', name: 'bungeecord-api', version:'1.14-SNAPSHOT'
-    compileOnly 'io.github.waterfallmc:waterfall-api:1.14-SNAPSHOT'
+    compileOnly group: 'net.md-5', name: 'bungeecord-api', version: '1.16-R0.2-SNAPSHOT'
 
     compile group: 'com.zaxxer', name: 'HikariCP', version: '3.4.1'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version:'3.9.1'

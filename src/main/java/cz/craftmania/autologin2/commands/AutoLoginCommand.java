@@ -2,7 +2,9 @@ package cz.craftmania.autologin2.commands;
 
 import cz.craftmania.autologin2.Main;
 import cz.craftmania.autologin2.utils.ChatInfo;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
@@ -37,7 +39,7 @@ public class AutoLoginCommand extends Command {
                 break;
             case "add":
                 if (args.length < 2) {
-                    ChatInfo.error(player, "Použítí: /autologin check <hráč>");
+                    ChatInfo.error(player, "Použítí: /autologin add <hráč>");
                     break;
                 }
                 String targetPlayer2 = args[1];
@@ -51,10 +53,13 @@ public class AutoLoginCommand extends Command {
                 }
                 Main.getSqlManager().insertData(targetPlayer2);
                 ChatInfo.success(player, targetPlayer2 + " byl přidán do databáze, již se nepřipojí jako warez.");
+                if (Main.getInstance().getProxy().getPlayer(targetPlayer2) != null) {
+                    Main.getInstance().getProxy().getPlayer(targetPlayer2).disconnect(TextComponent.fromLegacyText("Byl jsi přidán jako originálka, připoj se znovu.", ChatColor.RED));
+                }
                 break;
             case "remove":
                 if (args.length < 2) {
-                    ChatInfo.error(player, "Použítí: /autologin check <hráč>");
+                    ChatInfo.error(player, "Použítí: /autologin remove <hráč>");
                     break;
                 }
                 String targetPlayer3 = args[1];

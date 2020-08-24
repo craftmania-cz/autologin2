@@ -1,6 +1,7 @@
 package cz.craftmania.autologin2.utils;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class ChatInfo {
@@ -12,7 +13,7 @@ public class ChatInfo {
      * @param message Text of message
      */
     public static void info(ProxiedPlayer player, String message) {
-        player.sendMessage(ChatColor.GRAY + "> " + ChatColor.GRAY + message);
+        player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "> " + ChatColor.GRAY + message));
     }
 
     /**
@@ -22,7 +23,7 @@ public class ChatInfo {
      * @param message Text of successful message
      */
     public static void success(ProxiedPlayer player, String message) {
-        player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ">> " + ChatColor.GREEN + message);
+        player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "" + ChatColor.BOLD + ">> " + ChatColor.GREEN + message));
     }
 
     /**
@@ -32,7 +33,7 @@ public class ChatInfo {
      * @param message Text of error message
      */
     public static void error(ProxiedPlayer player, String message) {
-        player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "[!!] " + ChatColor.RED  + message);
+        player.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "" + ChatColor.BOLD + "[!!] " + ChatColor.RED + message));
     }
 
     /**
@@ -42,7 +43,7 @@ public class ChatInfo {
      * @param message Text of warning message
      */
     public static void warning(ProxiedPlayer player, String message) {
-        player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "[!] " + ChatColor.GOLD + message);
+        player.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "" + ChatColor.BOLD + "[!] " + ChatColor.GOLD + message));
     }
 
     /**
@@ -52,7 +53,7 @@ public class ChatInfo {
      * @param message Text of debug message
      */
     public static void debug(ProxiedPlayer player, String message) {
-        player.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "[D] " + ChatColor.AQUA + message);
+        player.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "" + ChatColor.BOLD + "[D] " + ChatColor.AQUA + message));
     }
 
 }

@@ -1,11 +1,12 @@
 package cz.craftmania.autologin2.sql;
 
 import com.zaxxer.hikari.HikariDataSource;
-import cz.craftmania.autologin2.Main;
 import cz.craftmania.autologin2.utils.Log;
 
 import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class SQLManager {
@@ -25,13 +26,15 @@ public class SQLManager {
         return pool;
     }
 
+    private final List<String> nicksInDatabase = new ArrayList<>();
+
     public void createTable() {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
-             conn = pool.getConnection();
-             ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS autologin_players (id int auto_increment, uuid varchar(64) not null, nick varchar(32) not null, last_online datetime null, constraint autologin_players_pk primary key (id));");
-             ps.executeUpdate();
+            conn = pool.getConnection();
+            ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS autologin_players (id int auto_increment, uuid varchar(64) not null, nick varchar(32) not null, last_online datetime null, constraint autologin_players_pk primary key (id));");
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -58,6 +61,7 @@ public class SQLManager {
     }
 
     public boolean isInDatabase(String nick) {
+        if (this.nicksInDatabase.contains(nick)) return true;
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -65,6 +69,7 @@ public class SQLManager {
             ps = conn.prepareStatement("SELECT * FROM autologin_players WHERE nick LIKE ?;");
             ps.setString(1, nick);
             ps.executeQuery();
+            if (ps.getResultSet().next()) this.nicksInDatabase.add(nick);
             return ps.getResultSet().next();
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,6 +80,7 @@ public class SQLManager {
     }
 
     public void insertData(UUID uuid, String nick) {
+        nicksInDatabase.add(nick);
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -90,7 +96,8 @@ public class SQLManager {
         }
     }
 
-    public void insertData( String nick) {
+    public void insertData(String nick) {
+        nicksInDatabase.add(nick);
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -123,6 +130,7 @@ public class SQLManager {
     }
 
     public void remove(String nick) {
+        this.nicksInDatabase.remove(nick);
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -191,5 +199,4 @@ public class SQLManager {
         }
         return toReturn;
     }
-
 }

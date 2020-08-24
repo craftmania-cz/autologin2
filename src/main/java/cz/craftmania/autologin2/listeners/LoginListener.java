@@ -3,10 +3,14 @@ package cz.craftmania.autologin2.listeners;
 import cz.craftmania.autologin2.Main;
 import cz.craftmania.autologin2.utils.Log;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.*;
+import net.md_5.bungee.api.event.LoginEvent;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.PreLoginEvent;
+import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -32,28 +36,24 @@ public class LoginListener implements Listener {
         Log.debug(nick + " (" + address + ") is connecting to server...");
 
         if (pattern.matcher(nick.replace("_", "")).find()) {
-            event.setCancelReason(ChatColor.translateAlternateColorCodes('&', Main.getOptions().getInvalidNick()));
+            event.setCancelReason(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', Main.getOptions().getInvalidNick())));
             event.setCancelled(true);
-            Log.debug(nick + " má nepovolené znaky v nicku - nebyl připojen.");
+            Log.info(nick + " má nepovolené znaky v nicku - nebyl připojen.");
             return;
         }
 
         if (Main.getSqlManager().isInDatabase(nick)) {
             Log.debug(nick + " is in database, online-mode: true");
             connection.setOnlineMode(true);
-            if (this.namesock.containsKey(nick)) {
-                this.namesock.remove(nick);
-            }
-            if (this.prev.containsKey(address)) {
-                this.prev.remove(address);
-            }
+            this.namesock.remove(nick);
+            this.prev.remove(address);
             this.cd2.put(nick, address);
             return;
         }
         Log.debug("online-mode: false");
         if (!this.cd2.isEmpty() && this.cd2.containsKey(nick) && this.cd2.get(nick).equals(address)) {
             this.cd2.remove(nick);
-            event.setCancelReason(ChatColor.translateAlternateColorCodes('&', Main.getOptions().getInvalidToken()));
+            event.setCancelReason(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', Main.getOptions().getInvalidToken())));
             event.setCancelled(true);
             return;
         }
@@ -85,7 +85,7 @@ public class LoginListener implements Listener {
         UUID uuid = connection.getUniqueId();
         String address = connection.getAddress().getAddress().getCanonicalHostName();
 
-        if (this.cd2.containsKey(nick)) this.cd2.remove(nick);
+        this.cd2.remove(nick);
         if (this.namesock.containsKey(nick) && this.namesock.get(nick).equalsIgnoreCase(address)) return;
         if (Main.getSqlManager().isInDatabase(nick)) return;
         if (connection.isOnlineMode()) {
