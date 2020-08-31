@@ -1,6 +1,6 @@
 package cz.craftmania.autologin2.commands;
 
-import cz.craftmania.autologin2.Main;
+import cz.craftmania.autologin2.AutoLogin;
 import cz.craftmania.autologin2.utils.ChatInfo;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -31,7 +31,7 @@ public class AutoLoginCommand extends Command {
                     break;
                 }
                 String targetPlayer1 = args[1];
-                if (Main.getSqlManager().isInDatabase(targetPlayer1)) {
+                if (AutoLogin.getSqlManager().isInDatabase(targetPlayer1)) {
                     ChatInfo.info(player, targetPlayer1 + " hraje za originální účet.");
                     break;
                 }
@@ -43,18 +43,18 @@ public class AutoLoginCommand extends Command {
                     break;
                 }
                 String targetPlayer2 = args[1];
-                if (Main.getSqlManager().isInDatabase(targetPlayer2)) {
+                if (AutoLogin.getSqlManager().isInDatabase(targetPlayer2)) {
                     ChatInfo.error(player, "Hráč " + targetPlayer2 + " již je v databázi.");
                     break;
                 }
-                if (!Main.getLoginManager().isOriginal(targetPlayer2)) {
+                if (!AutoLogin.getLoginManager().isOriginal(targetPlayer2)) {
                     ChatInfo.error(player, "Nick " + targetPlayer2 + " není originální.");
                     break;
                 }
-                Main.getSqlManager().insertData(targetPlayer2);
+                AutoLogin.getSqlManager().insertData(targetPlayer2);
                 ChatInfo.success(player, targetPlayer2 + " byl přidán do databáze, již se nepřipojí jako warez.");
-                if (Main.getInstance().getProxy().getPlayer(targetPlayer2) != null) {
-                    Main.getInstance().getProxy().getPlayer(targetPlayer2).disconnect(TextComponent.fromLegacyText("Byl jsi přidán jako originálka, připoj se znovu.", ChatColor.RED));
+                if (AutoLogin.getInstance().getProxy().getPlayer(targetPlayer2) != null) {
+                    AutoLogin.getInstance().getProxy().getPlayer(targetPlayer2).disconnect(TextComponent.fromLegacyText("Byl jsi přidán jako originálka, připoj se znovu.", ChatColor.RED));
                 }
                 break;
             case "remove":
@@ -63,11 +63,11 @@ public class AutoLoginCommand extends Command {
                     break;
                 }
                 String targetPlayer3 = args[1];
-                if (!Main.getSqlManager().isInDatabase(targetPlayer3)) {
+                if (!AutoLogin.getSqlManager().isInDatabase(targetPlayer3)) {
                     ChatInfo.error(player, "Hráč " + targetPlayer3 + " není v databázi.");
                     break;
                 }
-                Main.getSqlManager().remove(targetPlayer3);
+                AutoLogin.getSqlManager().remove(targetPlayer3);
                 ChatInfo.success(player, targetPlayer3 + " byl odebrán z databáze.");
                 break;
         }

@@ -1,9 +1,8 @@
 package cz.craftmania.autologin2.options;
 
-import cz.craftmania.autologin2.Main;
+import cz.craftmania.autologin2.AutoLogin;
 import cz.craftmania.autologin2.utils.Log;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,19 +17,19 @@ public class Options {
     public void init() {
         this.authServers = new ArrayList<>();
         this.lobbyServers = new ArrayList<>();
-        this.debug = Main.getConfig().getBoolean("debug");
-        this.invalidNick = Main.getConfig().getString("messages.invalid_nick", "&cTento nick obsahuje neplatné znaky!");
-        this.invalidToken = Main.getConfig().getString("messages.invalid_token", "&cVypadá to, že se snažíš připojit s warez na originální nick - připoj se znovu.");
-        for (String s : Main.getConfig().getStringList("servers.auth")) {
+        this.debug = AutoLogin.getConfig().getBoolean("debug");
+        this.invalidNick = AutoLogin.getConfig().getString("messages.invalid_nick", "&cTento nick obsahuje neplatné znaky!");
+        this.invalidToken = AutoLogin.getConfig().getString("messages.invalid_token", "&cVypadá to, že se snažíš připojit s warez na originální nick - připoj se znovu.");
+        for (String s : AutoLogin.getConfig().getStringList("servers.auth")) {
             Log.debug("Adding auth server: " + s);
-            authServers.add(Main.getInstance().getProxy().getServerInfo(s));
+            authServers.add(AutoLogin.getInstance().getProxy().getServerInfo(s));
         }
-        for (String s : Main.getConfig().getStringList("servers.lobbies")) {
+        for (String s : AutoLogin.getConfig().getStringList("servers.lobbies")) {
             Log.debug("Adding lobby server: " + s);
-            lobbyServers.add(Main.getInstance().getProxy().getServerInfo(s));
+            lobbyServers.add(AutoLogin.getInstance().getProxy().getServerInfo(s));
         }
-        this.connectTimeout = Main.getConfig().getInt("connectivity.connect_timeout");
-        this.readTimeout = Main.getConfig().getInt("connectivity.read_timeout");
+        this.connectTimeout = AutoLogin.getConfig().getInt("connectivity.connect_timeout");
+        this.readTimeout = AutoLogin.getConfig().getInt("connectivity.read_timeout");
     }
 
     public List<ServerInfo> getAuthServers() {

@@ -1,6 +1,6 @@
 package cz.craftmania.autologin2.utils;
 
-import cz.craftmania.autologin2.Main;
+import cz.craftmania.autologin2.AutoLogin;
 
 public class Log {
 
@@ -17,7 +17,7 @@ public class Log {
     }
 
     public static void debug(String message) {
-        if (!Main.getOptions().isDebug()) return;
+        if (!AutoLogin.getOptions().isDebug()) return;
         send(LogColor.CYAN.colorize("…") + " " + LogColor.CYAN_HIGH_INTENSITY.colorize(message));
     }
 

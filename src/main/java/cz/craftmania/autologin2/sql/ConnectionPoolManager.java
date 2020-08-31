@@ -2,7 +2,7 @@ package cz.craftmania.autologin2.sql;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import cz.craftmania.autologin2.Main;
+import cz.craftmania.autologin2.AutoLogin;
 import cz.craftmania.autologin2.utils.Log;
 
 import java.sql.Connection;
@@ -33,13 +33,13 @@ public class ConnectionPoolManager {
     }
 
     private void init() {
-        host = Main.getConfig().getString("sql.hostname");
-        database = Main.getConfig().getString("sql.database");
-        username = Main.getConfig().getString("sql.username");
-        password = Main.getConfig().getString("sql.password");
-        minimumConnections = Main.getConfig().getInt("settings.minimumConnections");
-        maximumConnections = Main.getConfig().getInt("settings.maximumConnections");
-        connectionTimeout = Main.getConfig().getInt("settings.timeout");
+        host = AutoLogin.getConfig().getString("sql.hostname");
+        database = AutoLogin.getConfig().getString("sql.database");
+        username = AutoLogin.getConfig().getString("sql.username");
+        password = AutoLogin.getConfig().getString("sql.password");
+        minimumConnections = AutoLogin.getConfig().getInt("settings.minimumConnections");
+        maximumConnections = AutoLogin.getConfig().getInt("settings.maximumConnections");
+        connectionTimeout = AutoLogin.getConfig().getInt("settings.timeout");
     }
 
     private void setupPool() {
