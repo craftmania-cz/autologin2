@@ -16,59 +16,56 @@ public class AutoLoginCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!(sender instanceof ProxiedPlayer)) return;
-        ProxiedPlayer player = (ProxiedPlayer) sender;
-
         if (args.length <= 0) {
-            ChatInfo.error(player, "Použití: /autologin check/add/remove");
+            ChatInfo.error(sender, "Použití: /autologin check/add/remove");
             return;
         }
 
         switch (args[0].toLowerCase()) {
             case "check":
                 if (args.length < 2) {
-                    ChatInfo.error(player, "Použítí: /autologin check <hráč>");
+                    ChatInfo.error(sender, "Použítí: /autologin check <hráč>");
                     break;
                 }
                 String targetPlayer1 = args[1];
                 if (AutoLogin.getSqlManager().isInDatabase(targetPlayer1)) {
-                    ChatInfo.info(player, targetPlayer1 + " hraje za originální účet.");
+                    ChatInfo.info(sender, targetPlayer1 + " hraje za originální účet.");
                     break;
                 }
-                ChatInfo.info(player, targetPlayer1 + " se nikdy nepřipojil za originální účet.");
+                ChatInfo.info(sender, targetPlayer1 + " se nikdy nepřipojil za originální účet.");
                 break;
             case "add":
                 if (args.length < 2) {
-                    ChatInfo.error(player, "Použítí: /autologin add <hráč>");
+                    ChatInfo.error(sender, "Použítí: /autologin add <hráč>");
                     break;
                 }
                 String targetPlayer2 = args[1];
                 if (AutoLogin.getSqlManager().isInDatabase(targetPlayer2)) {
-                    ChatInfo.error(player, "Hráč " + targetPlayer2 + " již je v databázi.");
+                    ChatInfo.error(sender, "Hráč " + targetPlayer2 + " již je v databázi.");
                     break;
                 }
                 if (!AutoLogin.getLoginManager().isOriginal(targetPlayer2)) {
-                    ChatInfo.error(player, "Nick " + targetPlayer2 + " není originální.");
+                    ChatInfo.error(sender, "Nick " + targetPlayer2 + " není originální.");
                     break;
                 }
                 AutoLogin.getSqlManager().insertData(targetPlayer2);
-                ChatInfo.success(player, targetPlayer2 + " byl přidán do databáze, již se nepřipojí jako warez.");
+                ChatInfo.success(sender, targetPlayer2 + " byl přidán do databáze, již se nepřipojí jako warez.");
                 if (AutoLogin.getInstance().getProxy().getPlayer(targetPlayer2) != null) {
                     AutoLogin.getInstance().getProxy().getPlayer(targetPlayer2).disconnect(TextComponent.fromLegacyText("Byl jsi přidán jako originálka, připoj se znovu.", ChatColor.RED));
                 }
                 break;
             case "remove":
                 if (args.length < 2) {
-                    ChatInfo.error(player, "Použítí: /autologin remove <hráč>");
+                    ChatInfo.error(sender, "Použítí: /autologin remove <hráč>");
                     break;
                 }
                 String targetPlayer3 = args[1];
                 if (!AutoLogin.getSqlManager().isInDatabase(targetPlayer3)) {
-                    ChatInfo.error(player, "Hráč " + targetPlayer3 + " není v databázi.");
+                    ChatInfo.error(sender, "Hráč " + targetPlayer3 + " není v databázi.");
                     break;
                 }
                 AutoLogin.getSqlManager().remove(targetPlayer3);
-                ChatInfo.success(player, targetPlayer3 + " byl odebrán z databáze.");
+                ChatInfo.success(sender, targetPlayer3 + " byl odebrán z databáze.");
                 break;
         }
     }
