@@ -2,4 +2,4 @@ name: AutoLogin2
 version: 1.0.0
 description: Original-logins for CraftMania Auth
 authors: ["iGniSsak", "MrWakeCZ"]
-main: cz.craftmania.autologin2.Main
+main: cz.craftmania.autologin2.AutoLogin
