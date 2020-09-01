@@ -27,6 +27,11 @@ public class AutoLoginCommand extends Command {
                 return;
             }
 
+            if (AutoLogin.getSqlManager().isInDatabase(player.getName())) {
+                ChatInfo.error(player, "Již máš zapnutou funkci AutoLogin.");
+                return;
+            }
+
             try {
                 ConfirmAction.Action action = new ConfirmAction.Builder()
                         .setPlayer(player)
