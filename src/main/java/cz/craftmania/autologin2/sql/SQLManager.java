@@ -96,23 +96,6 @@ public class SQLManager {
         }
     }
 
-    public void insertData(String nick) {
-        nicksInDatabase.add(nick);
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = pool.getConnection();
-            ps = conn.prepareStatement("INSERT INTO autologin_players (nick, last_online) VALUES(?, CURRENT_TIMESTAMP);");
-            ps.setString(1, nick);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            pool.close(conn, ps, null);
-        }
-    }
-
-
     public void quit(String nick, UUID uuid) {
         Connection conn = null;
         PreparedStatement ps = null;

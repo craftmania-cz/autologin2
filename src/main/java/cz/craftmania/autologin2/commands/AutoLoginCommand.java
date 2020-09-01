@@ -48,7 +48,8 @@ public class AutoLoginCommand extends Command {
                     ChatInfo.error(sender, "Nick " + targetPlayer2 + " není originální.");
                     break;
                 }
-                AutoLogin.getSqlManager().insertData(targetPlayer2);
+
+                AutoLogin.getSqlManager().insertData(AutoLogin.getLoginManager().getOriginalNickUUID(targetPlayer2), targetPlayer2);
                 ChatInfo.success(sender, targetPlayer2 + " byl přidán do databáze, již se nepřipojí jako warez.");
                 if (AutoLogin.getInstance().getProxy().getPlayer(targetPlayer2) != null) {
                     AutoLogin.getInstance().getProxy().getPlayer(targetPlayer2).disconnect(TextComponent.fromLegacyText("Byl jsi přidán jako originálka, připoj se znovu.", ChatColor.RED));

@@ -8,10 +8,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -19,7 +16,7 @@ import java.util.regex.Pattern;
 public class LoginManager {
 
     private final List<String> warezNicks = new ArrayList<>();
-    private final List<String> originalNicks = new ArrayList<>();
+    private final HashMap<String, UUID> originalNicks = new HashMap<>();
     private final Pattern UUID_FIX = Pattern.compile("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})");
 
     /**
@@ -31,7 +28,7 @@ public class LoginManager {
     private CompletableFuture<Boolean> isOriginalNick(String nick) {
         CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
         if (warezNicks.contains(nick)) completableFuture.complete(false);
-        if (originalNicks.contains(nick)) completableFuture.complete(true);
+        if (originalNicks.containsKey(nick)) completableFuture.complete(true);
         JSONObject json;
         try {
             Log.debug("Connecting to MineTools API (nick: " + nick + ").");
@@ -44,9 +41,10 @@ public class LoginManager {
             if (json.isNull("id") || json.get("id") == null) {
                 warezNicks.add(nick);
                 completableFuture.complete(false);
+            } else {
+                originalNicks.put(nick, fromTrimmed(json.getString("uuid")));
+                completableFuture.complete(true);
             }
-            originalNicks.add(nick);
-            completableFuture.complete(true);
         } catch (Exception e) {
             warezNicks.add(nick);
             Log.debug("Error while connecting to MineTools API - nick is not original.");
@@ -63,12 +61,16 @@ public class LoginManager {
      */
     public boolean isOriginal(String nick) {
         AtomicBoolean output = new AtomicBoolean(false);
-        if (this.originalNicks.contains(nick)) output.set(true);
-        if (this.warezNicks.contains(nick)) output.set(false);
-        CompletableFuture<Boolean> completableFuture = isOriginalNick(nick);
-        completableFuture.thenAccept(output::set);
+        if (this.originalNicks.containsKey(nick)) output.set(true);
+        else if (this.warezNicks.contains(nick)) output.set(false);
+        else {
+            CompletableFuture<Boolean> completableFuture = isOriginalNick(nick);
+            completableFuture.thenAccept(output::set);
+        }
 
-        this.warezNicks.add(nick);
+        if (!output.get())
+            this.warezNicks.add(nick);
+
         return output.get();
     }
 
@@ -82,5 +84,9 @@ public class LoginManager {
         if (servers.size() == 0) return null;
         if (servers.size() == 1) return servers.get(0);
         return servers.get(r.nextInt(servers.size() - 1));
+    }
+
+    public UUID getOriginalNickUUID(String nick) {
+        return this.originalNicks.getOrDefault(nick, null);
     }
 }
