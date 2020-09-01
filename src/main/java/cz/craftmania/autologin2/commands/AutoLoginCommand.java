@@ -2,8 +2,11 @@ package cz.craftmania.autologin2.commands;
 
 import cz.craftmania.autologin2.AutoLogin;
 import cz.craftmania.autologin2.utils.ChatInfo;
+import cz.craftmania.autologin2.utils.TextComponentBuilder;
+import cz.craftmania.autologin2.utils.actions.ConfirmAction;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -11,13 +14,42 @@ import net.md_5.bungee.api.plugin.Command;
 public class AutoLoginCommand extends Command {
 
     public AutoLoginCommand() {
-        super("autologin", "autologin.admin", "al");
+        super("autologin", null, "al");
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length <= 0) {
-            ChatInfo.error(sender, "Použití: /autologin check/add/remove [nick]");
+            if (!(sender instanceof ProxiedPlayer)) return;
+            ProxiedPlayer player = (ProxiedPlayer) sender;
+
+            if (!AutoLogin.getLoginManager().isOriginal(player.getName())) {
+                ChatInfo.error(player, "Tento nick není originální - nemůžeš si zapnout AutoLogin.");
+                return;
+            }
+
+            try {
+                ConfirmAction.Action action = new ConfirmAction.Builder()
+                        .setPlayer(player)
+                        .generateIdentifier()
+                        .addComponent(a -> new TextComponentBuilder("&aJako originálka si můžeš zapnout funkci &eAutoLogin&a pomocí, které se nemusíš nadále přihlašovat pomocí hesla. &cTohle taky zamezí připájení za warez na tvůj účet.").getComponent())
+                        .addComponent(a -> new TextComponentBuilder("§e[ Klikni zde pro zapnutí funkce AutoLogin ]").setTooltip("Klikni pro zapnutí funkce AutoLogin").setPerformedCommand(a.getConfirmationCommand()).getComponent())
+                        .setDelay(30L)
+                        .setRunnable(p -> {
+                            AutoLogin.getSqlManager().insertData(AutoLogin.getLoginManager().getOriginalNickUUID(p.getName()), p.getName());
+                            p.disconnect(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', "&cByl jsi zaregistrován jako originálka, připoj se znovu.")));
+                        })
+                        .setExpireRunnable(p -> ChatInfo.error(p, "AutoLogin zapnutí expirovalo."))
+                        .build();
+                
+                action.sendTextComponents();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ChatInfo.error(player, "Nastala chyba při inicializaci AutoLoginu.");
+            }
+
+            if (sender.hasPermission("autologin.admin"))
+                ChatInfo.error(sender, "Použití: /autologin check/add/remove [nick]");
             return;
         }
 

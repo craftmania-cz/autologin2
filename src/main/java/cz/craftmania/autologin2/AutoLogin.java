@@ -2,6 +2,7 @@ package cz.craftmania.autologin2;
 
 import com.google.common.io.Files;
 import cz.craftmania.autologin2.commands.AutoLoginCommand;
+import cz.craftmania.autologin2.commands.ConfirmActionCommand;
 import cz.craftmania.autologin2.listeners.LoginListener;
 import cz.craftmania.autologin2.login.LoginManager;
 import cz.craftmania.autologin2.options.Options;
@@ -43,6 +44,7 @@ public class AutoLogin extends Plugin {
 
         getProxy().getPluginManager().registerListener(this, new LoginListener());
         getProxy().getPluginManager().registerCommand(this, new AutoLoginCommand());
+        getProxy().getPluginManager().registerCommand(this, new ConfirmActionCommand());
     }
 
     @Override
