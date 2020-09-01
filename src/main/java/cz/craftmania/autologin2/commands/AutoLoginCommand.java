@@ -6,7 +6,6 @@ import cz.craftmania.autologin2.utils.TextComponentBuilder;
 import cz.craftmania.autologin2.utils.actions.ConfirmAction;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -41,7 +40,7 @@ public class AutoLoginCommand extends Command {
                         })
                         .setExpireRunnable(p -> ChatInfo.error(p, "AutoLogin zapnutí expirovalo."))
                         .build();
-                
+
                 action.sendTextComponents();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -55,6 +54,7 @@ public class AutoLoginCommand extends Command {
 
         switch (args[0].toLowerCase()) {
             case "check":
+                if (!sender.hasPermission("autologin.admin")) break;
                 if (args.length < 2) {
                     ChatInfo.error(sender, "Použítí: /autologin check <hráč>");
                     break;
@@ -67,6 +67,7 @@ public class AutoLoginCommand extends Command {
                 ChatInfo.info(sender, targetPlayer1 + " se nikdy nepřipojil za originální účet.");
                 break;
             case "add":
+                if (!sender.hasPermission("autologin.admin")) break;
                 if (args.length < 2) {
                     ChatInfo.error(sender, "Použítí: /autologin add <hráč>");
                     break;
@@ -88,6 +89,7 @@ public class AutoLoginCommand extends Command {
                 }
                 break;
             case "remove":
+                if (!sender.hasPermission("autologin.admin")) break;
                 if (args.length < 2) {
                     ChatInfo.error(sender, "Použítí: /autologin remove <hráč>");
                     break;
