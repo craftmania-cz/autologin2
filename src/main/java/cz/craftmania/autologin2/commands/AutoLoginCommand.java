@@ -17,7 +17,7 @@ public class AutoLoginCommand extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length <= 0) {
-            ChatInfo.error(sender, "Použití: /autologin check/add/remove");
+            ChatInfo.error(sender, "Použití: /autologin check/add/remove [nick]");
             return;
         }
 
