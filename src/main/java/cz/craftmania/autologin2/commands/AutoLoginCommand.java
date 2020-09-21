@@ -47,6 +47,7 @@ public class AutoLoginCommand extends Command {
                         .build();
 
                 action.sendTextComponents();
+                return;
             } catch (Exception e) {
                 e.printStackTrace();
                 ChatInfo.error(player, "Nastala chyba při inicializaci AutoLoginu.");

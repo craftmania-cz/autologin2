@@ -68,6 +68,8 @@ public class LoginListener implements Listener {
             Log.debug(nick + " is warez nick, online-mode: false");
             connection.setOnlineMode(false);
             return;
+        } else {
+            Log.debug(nick + " is original nick, online-mode: true");
         }
 
         if (this.warezTokens.containsKey(nick) && this.warezTokens.get(nick).equalsIgnoreCase(address)) {
@@ -79,7 +81,7 @@ public class LoginListener implements Listener {
 
         if (this.cache2.containsKey(address) && this.cache2.get(address).equalsIgnoreCase(nick)) {
             this.warezTokens.put(nick, address);
-            Log.debug("(4) online-mode: false");
+            Log.debug("(4) online-mode: false [player has tried to use warez as original]");
             connection.setOnlineMode(false);
         }
 

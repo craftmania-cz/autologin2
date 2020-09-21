@@ -38,16 +38,17 @@ public class LoginManager {
             if (response.body() == null) completableFuture.complete(false);
             json = new JSONObject(response.body().string());
             Log.debug("Connected to MineTools API.");
-            if (json.isNull("id") || json.get("id") == null) {
+            if (json.isNull("id")) {
                 warezNicks.add(nick);
                 completableFuture.complete(false);
             } else {
-                originalNicks.put(nick, fromTrimmed(json.getString("uuid")));
+                originalNicks.put(nick, fromTrimmed(json.getString("id")));
                 completableFuture.complete(true);
             }
         } catch (Exception e) {
             warezNicks.add(nick);
             Log.debug("Error while connecting to MineTools API - nick is not original.");
+            e.printStackTrace();
             completableFuture.completeExceptionally(e);
         }
         return completableFuture;
@@ -65,7 +66,9 @@ public class LoginManager {
         else if (this.warezNicks.contains(nick)) output.set(false);
         else {
             CompletableFuture<Boolean> completableFuture = isOriginalNick(nick);
-            completableFuture.thenAccept(output::set);
+            completableFuture.whenComplete((consumer, _throwable) -> {
+                output.set(consumer);
+            });
         }
 
         if (!output.get())
