@@ -2,6 +2,7 @@ package cz.craftmania.autologin2;
 
 import com.google.common.io.Files;
 import cz.craftmania.autologin2.commands.AutoLoginCommand;
+import cz.craftmania.autologin2.commands.ConfirmActionCommand;
 import cz.craftmania.autologin2.listeners.LoginListener;
 import cz.craftmania.autologin2.login.LoginManager;
 import cz.craftmania.autologin2.options.Options;
@@ -14,10 +15,10 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.*;
 
-public class Main extends Plugin {
+public class AutoLogin extends Plugin {
 
     private static SQLManager sqlManager;
-    private static Main instance;
+    private static AutoLogin instance;
     private static File configFile;
     private static Configuration config;
     private static Options options;
@@ -43,6 +44,7 @@ public class Main extends Plugin {
 
         getProxy().getPluginManager().registerListener(this, new LoginListener());
         getProxy().getPluginManager().registerCommand(this, new AutoLoginCommand());
+        getProxy().getPluginManager().registerCommand(this, new ConfirmActionCommand());
     }
 
     @Override
@@ -51,7 +53,7 @@ public class Main extends Plugin {
         sqlManager.onDisable();
     }
 
-    public static Main getInstance() {
+    public static AutoLogin getInstance() {
         return instance;
     }
 
@@ -76,16 +78,16 @@ public class Main extends Plugin {
             if (!this.getDataFolder().exists()) {
                 this.getDataFolder().mkdir();
             }
-            Main.configFile = new File(this.getDataFolder(), "config.yml");
-            if (!Main.configFile.exists()) {
+            AutoLogin.configFile = new File(this.getDataFolder(), "config.yml");
+            if (!AutoLogin.configFile.exists()) {
                 try (InputStream in = getResourceAsStream("config.yml")) {
                     java.nio.file.Files.copy(in, configFile.toPath());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            final InputStream configInputStream = Files.asByteSource(Main.configFile).openStream();
-            Main.config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new BufferedReader(new InputStreamReader(configInputStream)));
+            final InputStream configInputStream = Files.asByteSource(AutoLogin.configFile).openStream();
+            AutoLogin.config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new BufferedReader(new InputStreamReader(configInputStream)));
             configInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -98,7 +100,7 @@ public class Main extends Plugin {
 
     public static void saveConfig() {
         try {
-            ConfigurationProvider.getProvider(YamlConfiguration.class).save(Main.config, Main.configFile);
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(AutoLogin.config, AutoLogin.configFile);
         } catch (IOException e) {
             getInstance().getLogger().warning("Config could not be saved!");
             e.printStackTrace();
