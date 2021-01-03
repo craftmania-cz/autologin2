@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class SQLManager {
 
@@ -60,8 +61,9 @@ public class SQLManager {
         }
     }
 
-    public boolean isInDatabase(String nick) {
-        if (this.nicksInDatabase.contains(nick)) return true;
+    public CompletableFuture<Boolean> isInDatabase(String nick) {
+        CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
+        if (this.nicksInDatabase.contains(nick)) completableFuture.complete(true);
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -70,13 +72,14 @@ public class SQLManager {
             ps.setString(1, nick);
             ps.executeQuery();
             if (ps.getResultSet().next()) this.nicksInDatabase.add(nick);
-            return ps.getResultSet().next();
+            completableFuture.complete(ps.getResultSet().next());
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            completableFuture.completeExceptionally(e);
         } finally {
             pool.close(conn, ps, null);
         }
+        return completableFuture;
     }
 
     public void insertData(UUID uuid, String nick) {

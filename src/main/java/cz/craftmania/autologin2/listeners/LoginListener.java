@@ -16,6 +16,7 @@ import net.md_5.bungee.event.EventHandler;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 public class LoginListener implements Listener {
@@ -41,51 +42,54 @@ public class LoginListener implements Listener {
             return;
         }
 
-        if (AutoLogin.getSqlManager().isInDatabase(nick)) {
-            Log.debug(nick + " is in database, online-mode: true");
+        final CompletableFuture<Boolean> inDatabase = AutoLogin.getSqlManager().isInDatabase(nick);
+        inDatabase.thenAccept(isInDatabaseBoolean -> {
+            if (isInDatabaseBoolean) {
+                Log.debug(nick + " is in database, online-mode: true");
+                connection.setOnlineMode(true);
+                this.warezTokens.remove(nick);
+                this.cache2.remove(address);
+                this.originalTokens.put(nick, address);
+                return;
+            }
+
+            Log.debug("(1) online-mode: false");
+
+            if (this.originalTokens.containsKey(nick) && this.originalTokens.get(nick).equals(address)) {
+                // Token is registered, but player is no longer in database - will get kicked
+                this.originalTokens.remove(nick);
+                event.setCancelReason(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', AutoLogin.getOptions().getInvalidToken())));
+                event.setCancelled(true);
+                return;
+            }
+
             connection.setOnlineMode(true);
-            this.warezTokens.remove(nick);
-            this.cache2.remove(address);
-            this.originalTokens.put(nick, address);
-            return;
-        }
+            Log.debug("(2) online-mode: true");
 
-        Log.debug("(1) online-mode: false");
+            if (!AutoLogin.getLoginManager().isOriginal(nick)) {
+                // Not an original username
+                Log.debug(nick + " is warez nick, online-mode: false");
+                connection.setOnlineMode(false);
+                return;
+            } else {
+                Log.debug(nick + " is original nick, online-mode: true");
+            }
 
-        if (this.originalTokens.containsKey(nick) && this.originalTokens.get(nick).equals(address)) {
-            // Token is registered, but player is no longer in database - will get kicked
-            this.originalTokens.remove(nick);
-            event.setCancelReason(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', AutoLogin.getOptions().getInvalidToken())));
-            event.setCancelled(true);
-            return;
-        }
+            if (this.warezTokens.containsKey(nick) && this.warezTokens.get(nick).equalsIgnoreCase(address)) {
+                // Player already connected, he is not original.
+                Log.debug("(3) online-mode: false");
+                connection.setOnlineMode(false);
+                return;
+            }
 
-        connection.setOnlineMode(true);
-        Log.debug("(2) online-mode: true");
+            if (this.cache2.containsKey(address) && this.cache2.get(address).equalsIgnoreCase(nick)) {
+                this.warezTokens.put(nick, address);
+                Log.debug("(4) online-mode: false [player has tried to use warez as original]");
+                connection.setOnlineMode(false);
+            }
 
-        if (!AutoLogin.getLoginManager().isOriginal(nick)) {
-            // Not an original username
-            Log.debug(nick + " is warez nick, online-mode: false");
-            connection.setOnlineMode(false);
-            return;
-        } else {
-            Log.debug(nick + " is original nick, online-mode: true");
-        }
-
-        if (this.warezTokens.containsKey(nick) && this.warezTokens.get(nick).equalsIgnoreCase(address)) {
-            // Player already connected, he is not original.
-            Log.debug("(3) online-mode: false");
-            connection.setOnlineMode(false);
-            return;
-        }
-
-        if (this.cache2.containsKey(address) && this.cache2.get(address).equalsIgnoreCase(nick)) {
-            this.warezTokens.put(nick, address);
-            Log.debug("(4) online-mode: false [player has tried to use warez as original]");
-            connection.setOnlineMode(false);
-        }
-
-        this.cache2.put(address, nick);
+            this.cache2.put(address, nick);
+        });
     }
 
     @EventHandler
@@ -97,13 +101,19 @@ public class LoginListener implements Listener {
 
         this.originalTokens.remove(nick);
         if (this.warezTokens.containsKey(nick) && this.warezTokens.get(nick).equalsIgnoreCase(address)) return;
-        if (AutoLogin.getSqlManager().isInDatabase(nick)) return;
-        if (connection.isOnlineMode()) {
-            // Player is in cache2
-            Log.debug("Inserting into database: " + nick + " (UUID: " + uuid + ")");
-            AutoLogin.getSqlManager().insertData(uuid, nick);
-            this.warezTokens.remove(nick);
-        }
+
+        final CompletableFuture<Boolean> inDatabase = AutoLogin.getSqlManager().isInDatabase(nick);
+
+        inDatabase.thenAccept(isInDatabase -> {
+            if (isInDatabase) return;
+            if (connection.isOnlineMode()) {
+                // Player is in cache2
+                Log.debug("Inserting into database: " + nick + " (UUID: " + uuid + ")");
+                AutoLogin.getSqlManager().insertData(uuid, nick);
+                this.warezTokens.remove(nick);
+            }
+        });
+
     }
 
     @EventHandler
@@ -112,19 +122,29 @@ public class LoginListener implements Listener {
         ServerInfo server = event.getTarget();
         if (AutoLogin.getOptions().getAuthServers().contains(server)) {
             // Player is on auth server
-            if (AutoLogin.getSqlManager().isInDatabase(player.getName())) {
-                ServerInfo target = AutoLogin.getLoginManager().getRandomLobby();
-                if (target == null) return;
-                event.setTarget(target);
-                Log.debug(player.getName() + " is original, forwarding to: " + target.getName());
-            }
+            final CompletableFuture<Boolean> inDatabase = AutoLogin.getSqlManager().isInDatabase(player.getName());
+
+            inDatabase.thenAccept(isInDatabase -> {
+                if (isInDatabase) {
+                    ServerInfo target = AutoLogin.getLoginManager().getRandomLobby();
+                    if (target == null) return;
+                    event.setTarget(target);
+                    Log.debug(player.getName() + " is original, forwarding to: " + target.getName());
+                }
+            });
         }
     }
 
     @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        if (AutoLogin.getSqlManager().isInDatabase(player.getName())) AutoLogin.getSqlManager().quit(player.getName(), player.getUniqueId());
+        final CompletableFuture<Boolean> inDatabase = AutoLogin.getSqlManager().isInDatabase(player.getName());
+
+        // Note: This can be asynchronous because this is just updating last online column in database
+        inDatabase.thenAcceptAsync(isInDatabase -> {
+            if (isInDatabase) AutoLogin.getSqlManager().quit(player.getName(), player.getUniqueId());
+        });
+
     }
 
 }
