@@ -1,5 +1,6 @@
 package cz.craftmania.autologin2.listeners;
 
+import com.sun.istack.internal.Nullable;
 import cz.craftmania.autologin2.AutoLogin;
 import cz.craftmania.autologin2.utils.Log;
 import net.md_5.bungee.api.ChatColor;
@@ -41,11 +42,14 @@ public class LoginListener implements Listener {
             return;
         }
 
-        if (!AutoLogin.getSqlManager().getNickFromDatabase(nick).equals(nick)) {
-            event.setCancelReason(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', AutoLogin.getOptions().getChangeNick())));
-            event.setCancelled(true);
-            Log.info(nick + " má upravený nick originálky - nebyl připojen.");
-            return;
+        @Nullable String nickFromDatabase = AutoLogin.getSqlManager().getNickFromDatabase(nick);
+        if (nickFromDatabase != null) {
+            if (!nickFromDatabase.equals(nick)) {
+                event.setCancelReason(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', AutoLogin.getOptions().getChangeNick())));
+                event.setCancelled(true);
+                Log.info(nick + " má upravený nick originálky - nebyl připojen.");
+                return;
+            }
         }
 
         if (AutoLogin.getSqlManager().isInDatabase(nick)) {
