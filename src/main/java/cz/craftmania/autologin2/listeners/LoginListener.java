@@ -1,6 +1,5 @@
 package cz.craftmania.autologin2.listeners;
 
-import com.sun.istack.internal.Nullable;
 import cz.craftmania.autologin2.AutoLogin;
 import cz.craftmania.autologin2.utils.Log;
 import net.md_5.bungee.api.ChatColor;
