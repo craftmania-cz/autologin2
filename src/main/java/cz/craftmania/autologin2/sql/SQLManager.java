@@ -83,7 +83,7 @@ public class SQLManager {
         PreparedStatement ps = null;
         try {
             conn = pool.getConnection();
-            ps = conn.prepareStatement("SELECT nick FROM autologin_players WHERE nick = ?;");
+            ps = conn.prepareStatement("SELECT nick FROM autologin_players WHERE lower(nick) LIKE lower(?);");
             ps.setString(1, nick);
             final ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
