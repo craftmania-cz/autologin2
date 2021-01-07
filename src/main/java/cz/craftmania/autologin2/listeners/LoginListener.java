@@ -42,7 +42,7 @@ public class LoginListener implements Listener {
             return;
         }
 
-        @Nullable String nickFromDatabase = AutoLogin.getSqlManager().getNickFromDatabase(nick);
+        String nickFromDatabase = AutoLogin.getSqlManager().getNickFromDatabase(nick);
         if (nickFromDatabase != null) {
             if (!nickFromDatabase.equals(nick)) {
                 event.setCancelReason(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', AutoLogin.getOptions().getChangeNick())));

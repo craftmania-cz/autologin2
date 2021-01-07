@@ -1,6 +1,5 @@
 package cz.craftmania.autologin2.sql;
 
-import com.sun.istack.internal.Nullable;
 import com.zaxxer.hikari.HikariDataSource;
 import cz.craftmania.autologin2.utils.Log;
 
@@ -78,7 +77,6 @@ public class SQLManager {
         }
     }
 
-    @Nullable
     public String getNickFromDatabase(String nick) {
         if (this.nicksInDatabase.contains(nick)) return nick;
         Connection conn = null;
