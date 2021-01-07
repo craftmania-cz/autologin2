@@ -35,15 +35,25 @@ public class LoginManager {
             OkHttpClient caller = new OkHttpClient();
             Request request = (new Request.Builder()).url("https://api.minetools.eu/uuid/" + nick).build();
             Response response = caller.newCall(request).execute();
-            if (response.body() == null) completableFuture.complete(false);
-            json = new JSONObject(response.body().string());
-            Log.debug("Connected to MineTools API.");
-            if (json.isNull("id")) {
-                warezNicks.add(nick);
+            if (response.body() == null) {
                 completableFuture.complete(false);
             } else {
-                originalNicks.put(nick, fromTrimmed(json.getString("id")));
-                completableFuture.complete(true);
+                json = new JSONObject(response.body().string());
+                Log.debug("Connected to MineTools API.");
+                if (json.isNull("id")) {
+                    warezNicks.add(nick);
+                    completableFuture.complete(false);
+                } else {
+                    // UUID IS NOT NULL
+                    if (!json.getString("name").equals(nick)) {
+                        // Waked_ != WAKED_
+                        warezNicks.add(nick);
+                        completableFuture.complete(false);
+                    } else {
+                        originalNicks.put(nick, fromTrimmed(json.getString("id")));
+                        completableFuture.complete(true);
+                    }
+                }
             }
         } catch (Exception e) {
             warezNicks.add(nick);
