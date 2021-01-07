@@ -66,7 +66,7 @@ public class SQLManager {
         PreparedStatement ps = null;
         try {
             conn = pool.getConnection();
-            ps = conn.prepareStatement("SELECT * FROM autologin_players WHERE nick LIKE ?;");
+            ps = conn.prepareStatement("SELECT * FROM autologin_players WHERE nick = ?;");
             ps.setString(1, nick);
             ps.executeQuery();
             if (ps.getResultSet().next()) this.nicksInDatabase.add(nick);
