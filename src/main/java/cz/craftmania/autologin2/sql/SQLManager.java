@@ -28,6 +28,23 @@ public class SQLManager {
 
     private final List<String> nicksInDatabase = new ArrayList<>();
 
+    public void cacheOriginalNicksInDatabase() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = pool.getConnection();
+            ps = conn.prepareStatement("SELECT nick FROM autologin_players;");
+            final ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                nicksInDatabase.add(resultSet.getString("nick"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            pool.close(conn, ps, null);
+        }
+    }
+
     public void createTable() {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -60,16 +77,39 @@ public class SQLManager {
         }
     }
 
+    public String getNickFromDatabase(String nick) {
+        if (this.nicksInDatabase.contains(nick)) return nick;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = pool.getConnection();
+            ps = conn.prepareStatement("SELECT nick FROM autologin_players WHERE nick = ?;");
+            ps.setString(1, nick);
+            final ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                final String nick1 = resultSet.getString("nick");
+                this.nicksInDatabase.add(nick1);
+                return nick1;
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            pool.close(conn, ps, null);
+        }
+    }
+
     public boolean isInDatabase(String nick) {
         if (this.nicksInDatabase.contains(nick)) return true;
         Connection conn = null;
         PreparedStatement ps = null;
         try {
             conn = pool.getConnection();
-            ps = conn.prepareStatement("SELECT * FROM autologin_players WHERE nick = ?;");
+            ps = conn.prepareStatement("SELECT nick FROM autologin_players WHERE nick = ?;");
             ps.setString(1, nick);
-            ps.executeQuery();
-            if (ps.getResultSet().next()) this.nicksInDatabase.add(nick);
+            final ResultSet resultSet = ps.executeQuery();
+            if (ps.getResultSet().next()) this.nicksInDatabase.add(resultSet.getString("nick"));
             return ps.getResultSet().next();
         } catch (Exception e) {
             e.printStackTrace();

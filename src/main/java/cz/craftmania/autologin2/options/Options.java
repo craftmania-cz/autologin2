@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Options {
 
-    public String  invalidNick, invalidToken;
+    public String  invalidNick, invalidToken, changeNick;
     public List<ServerInfo> authServers, lobbyServers;
     public boolean debug;
     public int connectTimeout, readTimeout;
@@ -20,6 +20,7 @@ public class Options {
         this.debug = AutoLogin.getConfig().getBoolean("debug");
         this.invalidNick = AutoLogin.getConfig().getString("messages.invalid_nick", "&cTento nick obsahuje neplatné znaky!");
         this.invalidToken = AutoLogin.getConfig().getString("messages.invalid_token", "&cVypadá to, že se snažíš připojit s warez na originální nick - připoj se znovu.");
+        this.changeNick = AutoLogin.getConfig().getString("messages.change_nick", "&cVypadá to, že používaš upravený nick originálky, změn si ho.");
         for (String s : AutoLogin.getConfig().getStringList("servers.auth")) {
             Log.debug("Adding auth server: " + s);
             authServers.add(AutoLogin.getInstance().getProxy().getServerInfo(s));
@@ -86,5 +87,13 @@ public class Options {
 
     public void setInvalidToken(String invalidToken) {
         this.invalidToken = invalidToken;
+    }
+
+    public String getChangeNick() {
+        return changeNick;
+    }
+
+    public void setChangeNick(String changeNick) {
+        this.changeNick = changeNick;
     }
 }

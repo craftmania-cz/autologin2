@@ -19,6 +19,7 @@ connectivity:
 messages:
   invalid_nick: "&cTento nick obsahuje neplatné znaky!"
   invalid_token: "&cVypadá to, že se snažíš připojit s warez na originální nick - připoj se znovu."
+  change_nick: "&cVypadá to, že používaš upravený nick originálky, změn si ho."
 
 servers:
   auth:

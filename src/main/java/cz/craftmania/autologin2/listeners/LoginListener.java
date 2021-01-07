@@ -41,6 +41,13 @@ public class LoginListener implements Listener {
             return;
         }
 
+        if (!AutoLogin.getSqlManager().getNickFromDatabase(nick).equals(nick)) {
+            event.setCancelReason(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', AutoLogin.getOptions().getChangeNick())));
+            event.setCancelled(true);
+            Log.info(nick + " má upravený nick originálky - nebyl připojen.");
+            return;
+        }
+
         if (AutoLogin.getSqlManager().isInDatabase(nick)) {
             Log.debug(nick + " is in database, online-mode: true");
             connection.setOnlineMode(true);
