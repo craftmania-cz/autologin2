@@ -13,6 +13,7 @@ import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -26,6 +27,10 @@ public class LoginListener implements Listener {
 
     @EventHandler
     public void onPreLogin(PreLoginEvent event) {
+        if (event.isCancelled()) {
+            Log.info("Canceled login event for " + event.getConnection().getName());
+            return;
+        }
         PendingConnection connection = event.getConnection();
         String nick = connection.getName();
         String address = connection.getAddress().getAddress().getCanonicalHostName();
@@ -100,6 +105,9 @@ public class LoginListener implements Listener {
 
     @EventHandler
     public void onLogin(LoginEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
         PendingConnection connection = event.getConnection();
         String nick = connection.getName();
         UUID uuid = connection.getUniqueId();
